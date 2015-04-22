@@ -4,21 +4,21 @@ import sys
 import threading
 
 def sendThread(conn, username):
-    print("send:")
-    inputStr = input(username + ": ")#+username + ': ')
+    print("Sending thread started....")
+    inputStr = input()#+username + ': ')
 
     while inputStr.lower() != "bye":
         msg = username + ": " + inputStr + "\n"
         #print("local: "+msg)
         #conn.send( str(len(msg)).encode() )
         conn.send( msg.encode()  )
-        inputStr = input(username + ": ")
+        inputStr = input()
     conn.send( str(len(msg)).encode() )
 
     conn.close()
 
 def recvThread(conn, username):
-    print("REcV")
+    print("Receving thread started....")
 
     buffSize = 10
     lastPrinted = ""
@@ -28,7 +28,6 @@ def recvThread(conn, username):
 
         for ch in data_recv:
             if ch == '\n':
-                print("Msg: " + storedData)
                 lastPrinted = storedData
                 print( lastPrinted )
                 storedData = ""

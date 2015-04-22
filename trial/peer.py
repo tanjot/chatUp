@@ -5,24 +5,24 @@ import threading
 import time
 
 def sendThread(conn, username):
-    print("send:")
+    print("Sending thread started....")
     #time.sleep(5)
     #print("Recv end ")
-    inputStr = input(username + ": ")#+username + ': ')
+    inputStr = input()#+username + ': ')
 
     while inputStr.lower() != "bye":
         msg = username + ": " + inputStr + "\n"
         #print(msg)
         #conn.send( str(len(msg)).encode() )
         conn.send( msg.encode()  )
-        inputStr = input(username + ": ")
+        inputStr = input()
     conn.send( str(len(msg)).encode() )
 
 
-    conn.close()
+    #conn.close()
 
 def recvThread(conn, username):
-    print("REcV")
+    print("Receving thread started....")
     #time.sleep(5)
     #print("Recv end ")
 
@@ -34,14 +34,13 @@ def recvThread(conn, username):
 
         for ch in data_recv:
             if ch == '\n':
-                print("Msg: " + storedData)
                 lastPrinted = storedData
                 print( lastPrinted )
                 storedData = ""
             else:
                 storedData = storedData + ch
     print("Msg: " + storedData)
-    sock.close()
+    #sock.close()
 
 
 
