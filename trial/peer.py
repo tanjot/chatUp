@@ -19,7 +19,7 @@ def sendThread(conn, username):
     msg = username + ": " + inputStr + "\n"
     conn.send( msg.encode() )
 
-
+    print("Sending thread started....")
     #conn.close()
 
 def recvThread(conn, username):
@@ -28,22 +28,25 @@ def recvThread(conn, username):
     #print("Recv end ")
 
     buffSize = 10
-    lastPrinted = ""
+    checkOnString = ""
     storedData = ""
-    while  lastPrinted != "bye":
+    while  checkOnString != "bye":
         data_recv = str(conn.recv(buffSize).decode())
 
         for ch in data_recv:
             if ch == '\n':
                 lastPrinted = storedData
                 print( lastPrinted )
+                index = lastPrinted.find(':')
+                checkOnString = lastPrinted[(index+1):].strip()
+                print("checkOnString: "+checkOnString)
                 storedData = ""
             else:
                 storedData = storedData + ch
     #print("Msg: " + storedData)
     #sock.close()
 
-
+    print("Receving thread ended....")
 
 def connectToPeer(peerPort):
 
@@ -56,8 +59,10 @@ def connectToPeer(peerPort):
 
     receivingThread.start()
     sendingThread.start()
-    ##join and close socket
-#sock.close()
+    receivingThread.join()
+    sendingThread.join()
+   ##join and close socket
+    sock.close()
 
 
 def main( arg = sys.argv ):
