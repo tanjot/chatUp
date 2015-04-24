@@ -16,7 +16,8 @@ def sendThread(conn, username):
         #conn.send( str(len(msg)).encode() )
         conn.send( msg.encode()  )
         inputStr = input()
-    conn.send( str(len(msg)).encode() )
+    msg = username + ": " + inputStr + "\n"
+    conn.send( msg.encode() )
 
 
     #conn.close()
@@ -39,7 +40,7 @@ def recvThread(conn, username):
                 storedData = ""
             else:
                 storedData = storedData + ch
-    print("Msg: " + storedData)
+    #print("Msg: " + storedData)
     #sock.close()
 
 

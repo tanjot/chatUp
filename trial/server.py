@@ -13,9 +13,11 @@ def sendThread(conn, username):
         #conn.send( str(len(msg)).encode() )
         conn.send( msg.encode()  )
         inputStr = input()
-    conn.send( str(len(msg)).encode() )
+    msg = username + ": " + inputStr + "\n"
+    print("end end end "+msg)
+    conn.send( msg.encode() )
 
-    conn.close()
+    #conn.close()
 
 def recvThread(conn, username):
     print("Receving thread started....")
@@ -33,8 +35,8 @@ def recvThread(conn, username):
                 storedData = ""
             else:
                 storedData = storedData + ch
-    print("Msg: " + storedData)
-    sock.close()
+    #print("Msg: " + storedData)
+    #sock.close()
 
 
 def acceptPeerConn(sock):
