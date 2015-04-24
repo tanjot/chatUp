@@ -5,19 +5,15 @@ import threading
 
 def sendThread(conn, username):
     print("Sending thread started....")
-    inputStr = input()#+username + ': ')
+    inputStr = input()
 
     while inputStr.lower() != "bye":
         msg = username + ": " + inputStr + "\n"
-        #print("local: "+msg)
-        #conn.send( str(len(msg)).encode() )
         conn.send( msg.encode()  )
         inputStr = input()
     msg = username + ": " + inputStr + "\n"
-    print("end end end "+msg)
     conn.send( msg.encode() )
     print("Sending thread ended....")
-    #conn.close()
 
 def recvThread(conn, username):
     print("Receving thread started....")
@@ -34,12 +30,9 @@ def recvThread(conn, username):
                 print( lastPrinted )
                 index = lastPrinted.find(':')
                 checkOnString = lastPrinted[(index+1):].strip()
-                print("checkOnString: "+checkOnString)
                 storedData = ""
             else:
                 storedData = storedData + ch
-    #print("Msg: " + storedData)
-    #sock.close()
     print("Receving thread ended....")
 
 def acceptPeerConn(sock):
@@ -51,10 +44,8 @@ def acceptPeerConn(sock):
     "Tanjot"))
     sendingThread = threading.Thread(target = sendThread, args = (peerConn,
         "Tanjot" ))
-    #start thread for each peer and handle both sending and receiving
-                                                                              #thread = threading.Thread(target = sendThread, args = (peerConn, "Tanjot"))
-    receivingThread.start()                                                          #thread.start()
-    sendingThread.start()                                                                #recvThread(peerConn, str(peerAddr))
+    sendingThread.start()
+    receivingThread.start()
     receivingThread.join()
     sendingThread.join()
     peerConn.close()
@@ -69,6 +60,7 @@ def main( arg = sys.argv ):
     sock.bind( (localAddr, port) )
     sock.listen(1)
     acceptPeerConn(sock)
+    #TODO: close socket appropriately
 
 #sock.close()
 

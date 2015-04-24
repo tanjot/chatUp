@@ -6,14 +6,10 @@ import time
 
 def sendThread(conn, username):
     print("Sending thread started....")
-    #time.sleep(5)
-    #print("Recv end ")
-    inputStr = input()#+username + ': ')
+    inputStr = input()
 
     while inputStr.lower() != "bye":
         msg = username + ": " + inputStr + "\n"
-        #print(msg)
-        #conn.send( str(len(msg)).encode() )
         conn.send( msg.encode()  )
         inputStr = input()
     msg = username + ": " + inputStr + "\n"
@@ -24,8 +20,6 @@ def sendThread(conn, username):
 
 def recvThread(conn, username):
     print("Receving thread started....")
-    #time.sleep(5)
-    #print("Recv end ")
 
     buffSize = 10
     checkOnString = ""
@@ -39,12 +33,9 @@ def recvThread(conn, username):
                 print( lastPrinted )
                 index = lastPrinted.find(':')
                 checkOnString = lastPrinted[(index+1):].strip()
-                print("checkOnString: "+checkOnString)
                 storedData = ""
             else:
                 storedData = storedData + ch
-    #print("Msg: " + storedData)
-    #sock.close()
 
     print("Receving thread ended....")
 
@@ -61,7 +52,6 @@ def connectToPeer(peerPort):
     sendingThread.start()
     receivingThread.join()
     sendingThread.join()
-   ##join and close socket
     sock.close()
 
 
