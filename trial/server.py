@@ -2,6 +2,7 @@
 import socket
 import sys
 import threading
+import argparse
 
 def sendThread(conn, username):
     print("Sending thread started....")
@@ -58,11 +59,28 @@ def acceptPeerConn(sock):
                 (peerConn,) )
         acceptPeerConnThread.start()
 
+def handleArguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("localPort", help= "Local port number to bind with",
+            type = int)
+    parser.add_argument("--localUsername", "-u", help = "Username to be"
+        "assigned")
+    parser.add_argument("--RemoteIPAndPort", "-r",type = str, nargs = 2, help = "IP address and port"
+        "number of the remote connection")
+
+
+    global argHandle
+    argHandle = parser.parse_args()
+
 def main( arg = sys.argv ):
+
+    handleArguments()
+    global argHandle
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print('In setUpLocalConnection port: '+(arg[1]))
+    print('In setUpLocalConnection port: '+str(argHandle.localPort))
     localAddr = socket.gethostname()
-    port = int(arg[1])
+    port = int(argHandle.localPort)
 
     sock.bind( (localAddr, port) )
     sock.listen(2)
