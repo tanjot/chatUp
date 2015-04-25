@@ -58,17 +58,9 @@ def connectToPeer(localPort, peerPort):
 
 
 def main( arg = sys.argv ):
-    #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #print('In setUpLocalConnection port: '+(arg[1]))
-    #localAddr = socket.gethostname()
-    #port = int(arg[1])
-
-    #sock.bind( (localAddr, port) )
-    #sock.listen(1)
-
 
     connectToPeer(int(arg[1]), int(arg[2]))
-#sock.close()
+#TODO: Close socket properly
 
 if __name__ == '__main__':
     main()

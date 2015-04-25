@@ -38,14 +38,13 @@ def recvThread(conn, username):
 
 def startConnectionThreads(peerConn):
     receivingThread = threading.Thread(target = recvThread, args = (peerConn,
-    "Tanjot"))
+        "Tanjot"))
     sendingThread = threading.Thread(target = sendThread, args = (peerConn,
-    "Tanjot" ))
+        "Tanjot" ))
     sendingThread.start()
     receivingThread.start()
     receivingThread.join()
     sendingThread.join()
-    print("join ended")
     peerConn.close()
 
 
@@ -55,7 +54,6 @@ def acceptPeerConn(sock):
     while True:
         print("in while loop")
         peerConn, peerAddr = sock.accept()
-        #acceptPeerConn(sock)
         acceptPeerConnThread = threading.Thread(target = startConnectionThreads, args =
                 (peerConn,) )
         acceptPeerConnThread.start()
@@ -69,14 +67,7 @@ def main( arg = sys.argv ):
     sock.bind( (localAddr, port) )
     sock.listen(2)
 
-    #noOfConnections = 0
-    #while noOfConnections<2:
-    #    acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
-    #        (sock) )
-    #    acceptPeerConnThread.start()
-    #    noOfConnections += 1
     #TODO: close socket appropriately
-
 
     acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
             (sock,) )
@@ -85,7 +76,6 @@ def main( arg = sys.argv ):
 
     print("End of main...")
 
-#sock.close()
 
 if __name__ == '__main__':
     main()
