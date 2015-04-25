@@ -39,10 +39,12 @@ def recvThread(conn, username):
 
     print("Receving thread ended....")
 
-def connectToPeer(peerPort):
+def connectToPeer(localPort, peerPort):
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     addr = socket.gethostname()
+
+    #sock.bind( (addr, localPort) )
 
     sock.connect( (addr, peerPort) )
     receivingThread = threading.Thread(target = recvThread, args = (sock, str(addr)))
@@ -56,16 +58,16 @@ def connectToPeer(peerPort):
 
 
 def main( arg = sys.argv ):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print('In setUpLocalConnection port: '+(arg[1]))
-    localAddr = socket.gethostname()
-    port = int(arg[1])
+    #sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #print('In setUpLocalConnection port: '+(arg[1]))
+    #localAddr = socket.gethostname()
+    #port = int(arg[1])
 
-    sock.bind( (localAddr, port) )
-    sock.listen(1)
+    #sock.bind( (localAddr, port) )
+    #sock.listen(1)
 
 
-    connectToPeer(int(arg[2]))
+    connectToPeer(int(arg[1]), int(arg[2]))
 #sock.close()
 
 if __name__ == '__main__':

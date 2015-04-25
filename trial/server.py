@@ -35,21 +35,30 @@ def recvThread(conn, username):
                 storedData = storedData + ch
     print("Receving thread ended....")
 
-def acceptPeerConn(sock):
-    print('In acceptPeerConnections')
 
-    #while True:
-    peerConn, peerAddr = sock.accept()
+def startConnectionThreads(peerConn):
     receivingThread = threading.Thread(target = recvThread, args = (peerConn,
     "Tanjot"))
     sendingThread = threading.Thread(target = sendThread, args = (peerConn,
-        "Tanjot" ))
+    "Tanjot" ))
     sendingThread.start()
     receivingThread.start()
     receivingThread.join()
     sendingThread.join()
+    print("join ended")
     peerConn.close()
 
+
+def acceptPeerConn(sock):
+    print('In acceptPeerConnections')
+
+    while True:
+        print("in while loop")
+        peerConn, peerAddr = sock.accept()
+        #acceptPeerConn(sock)
+        acceptPeerConnThread = threading.Thread(target = startConnectionThreads, args =
+                (peerConn,) )
+        acceptPeerConnThread.start()
 
 def main( arg = sys.argv ):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,9 +67,23 @@ def main( arg = sys.argv ):
     port = int(arg[1])
 
     sock.bind( (localAddr, port) )
-    sock.listen(1)
-    acceptPeerConn(sock)
+    sock.listen(2)
+
+    #noOfConnections = 0
+    #while noOfConnections<2:
+    #    acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
+    #        (sock) )
+    #    acceptPeerConnThread.start()
+    #    noOfConnections += 1
     #TODO: close socket appropriately
+
+
+    acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
+            (sock,) )
+    acceptPeerConnThread.start()
+    acceptPeerConnThread.join()
+
+    print("End of main...")
 
 #sock.close()
 
