@@ -81,30 +81,35 @@ def handleArguments():
 
     global argHandle
     argHandle = parser.parse_args()
-    return validatIP()
-    print("ip: "+argHandle.RemoteIPAndPort[0], "port: "+
-            argHandle.RemoteIPAndPort[1])
+    if argHandle.RemoteIPAndPort:
+        return validatIP()
+        print("ip: "+argHandle.RemoteIPAndPort[0], "port: "+
+                argHandle.RemoteIPAndPort[1])
+    #Bcoz Remoteipandport is optional
+    return True
 
 def main( arg = sys.argv ):
+    handleArguments()
+    global argHandle
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print('In setUpLocalConnection port: '+str(argHandle.localPort))
+    localAddr = socket.gethostname()
+    port = int(argHandle.localPort)
+
+    sock.bind( (localAddr, port) )
+    sock.listen(2)
+
+    #TODO: close socket appropriately
+
+    acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
+            (sock,) )
+    acceptPeerConnThread.start()
+    acceptPeerConnThread.join()
 
     if handleArguments():
-        global argHandle
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print('In setUpLocalConnection port: '+str(argHandle.localPort))
-        localAddr = socket.gethostname()
-        port = int(argHandle.localPort)
-
-        sock.bind( (localAddr, port) )
-        sock.listen(2)
-
-        #TODO: close socket appropriately
-
-        acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
-                (sock,) )
-        acceptPeerConnThread.start()
-        acceptPeerConnThread.join()
-
+        #create connection to that remote
+        print("No functionality for connecting to Peer")
     print("End of main...")
 
 

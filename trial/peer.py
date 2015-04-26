@@ -3,6 +3,8 @@ import socket
 import sys
 import threading
 import time
+import argparse
+import ipaddress
 
 def sendThread(conn, username):
     print("Sending thread started....")
@@ -39,14 +41,15 @@ def recvThread(conn, username):
 
     print("Receving thread ended....")
 
-def connectToPeer(localPort, peerPort):
+def connectToPeer():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     addr = socket.gethostname()
 
     #sock.bind( (addr, localPort) )
-
-    sock.connect( (addr, peerPort) )
+    global argHandle
+    sock.connect(
+            (argHandle.RemoteIPAndPort[0],int(argHandle.RemoteIPAndPort[1])) )
     receivingThread = threading.Thread(target = recvThread, args = (sock, str(addr)))
     sendingThread = threading.Thread(target = sendThread, args = (sock, str(addr) ))
 
@@ -57,9 +60,40 @@ def connectToPeer(localPort, peerPort):
     sock.close()
 
 
-def main( arg = sys.argv ):
 
-    connectToPeer(int(arg[1]), int(arg[2]))
+def validatIP():
+    global argHandle
+    try:
+        ipaddress.ip_address(argHandle.RemoteIPAndPort[0])
+    except:
+        print("Remote IP not valid")
+        return False
+    return True
+
+def handleArguments():
+    parser = argparse.ArgumentParser()
+   # parser.add_argument("localPort", help= "Local port number to bind with",
+   #         type = int)
+    parser.add_argument("--localUsername", "-u", help = "Username to be"
+        "assigned")
+    parser.add_argument("RemoteIPAndPort",type = str, nargs = 2, help = "IP address and port"
+        "number of the remote connection")
+
+
+    global argHandle
+    argHandle = parser.parse_args()
+    if argHandle.RemoteIPAndPort:
+        return validatIP()
+        print("ip: "+argHandle.RemoteIPAndPort[0], "port: "+
+                argHandle.RemoteIPAndPort[1])
+    return False
+
+
+def main( arg = sys.argv ):
+    if handleArguments():
+        global argHandle
+        if argHandle:
+            connectToPeer()
 #TODO: Close socket properly
 
 if __name__ == '__main__':
