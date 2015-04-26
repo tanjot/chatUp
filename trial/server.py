@@ -39,10 +39,16 @@ def recvThread(conn, username):
 
 
 def startConnectionThreads(peerConn):
+    global argHandle
+    if argHandle.localUsername:
+        username = argHandle.localUsername
+    else:
+        username = "NOname"
+
     receivingThread = threading.Thread(target = recvThread, args = (peerConn,
-        "Tanjot"))
+        username))
     sendingThread = threading.Thread(target = sendThread, args = (peerConn,
-        "Tanjot" ))
+        username))
     sendingThread.start()
     receivingThread.start()
     receivingThread.join()

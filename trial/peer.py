@@ -48,10 +48,16 @@ def connectToPeer():
 
     #sock.bind( (addr, localPort) )
     global argHandle
-    sock.connect(
-            (argHandle.RemoteIPAndPort[0],int(argHandle.RemoteIPAndPort[1])) )
-    receivingThread = threading.Thread(target = recvThread, args = (sock, str(addr)))
-    sendingThread = threading.Thread(target = sendThread, args = (sock, str(addr) ))
+    if argHandle.localUsername:
+        username = argHandle.localUsername
+    else:
+        username = "NOname"
+
+    sock.connect((argHandle.RemoteIPAndPort[0],int(argHandle.RemoteIPAndPort[1])) )
+    receivingThread = threading.Thread(target = recvThread, args = (sock,
+        username))
+    sendingThread = threading.Thread(target = sendThread, args = (sock,
+        username ))
 
     receivingThread.start()
     sendingThread.start()
