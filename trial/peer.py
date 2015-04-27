@@ -7,6 +7,9 @@ import argparse
 import ipaddress
 
 def sendThread(conn, username):
+    ''' Provides functionality for sending messages to all peer connected
+        '''
+
     print("Start sending thread....")
     inputStr = input()
 
@@ -23,6 +26,10 @@ def sendThread(conn, username):
     areSendReceiveWorking = False
 
 def recvThread(conn, username):
+    ''' Provides functionality for receiving message through peer connection
+        '''
+
+
     print("Start receving thread....")
 
     global areSendReceiveWorking
@@ -47,7 +54,8 @@ def recvThread(conn, username):
     areSendReceiveWorking = False
 
 def connectToPeer():
-
+    '''Connects to peer whose address is provided
+        '''
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     addr = socket.gethostname()
 
@@ -77,6 +85,9 @@ def connectToPeer():
 
 
 def validatIP():
+    ''' Validates IP address
+        '''
+
     global argHandle
     try:
         ipaddress.ip_address(argHandle.RemoteIPAndPort[0])
@@ -86,6 +97,9 @@ def validatIP():
     return True
 
 def handleArguments():
+    ''' Adds arguments and and validates them
+        '''
+
     parser = argparse.ArgumentParser()
    # parser.add_argument("localPort", help= "Local port number to bind with",
    #         type = int)

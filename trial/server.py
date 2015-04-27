@@ -5,7 +5,23 @@ import threading
 import argparse
 import ipaddress
 
+
+def removeConnFromList(conn = None):
+    ''' Removes and closes all peer connection from list if no connection is
+        provided else removes the particular connection provided in argument
+        '''
+    global peerList
+    if conn is None:
+        for it in peerList:
+            peerList.remove(it)
+            it.close()
+    else:
+        peerList.remove(conn)
+        conn.close()
+
 def sendThread(sock, username):
+    ''' Provides functionality for sending messages to all peer connected
+        '''
     print("Start sending thread....")
 
     global peerList
@@ -26,17 +42,9 @@ def sendThread(sock, username):
     print("Exit sending thread....")
     isSendThreadWorking = False
 
-def removeConnFromList(conn = None):
-    global peerList
-    if conn is None:
-        for it in peerList:
-            peerList.remove(it)
-            it.close()
-    else:
-        peerList.remove(conn)
-        conn.close()
-
 def recvThread(conn, username):
+    ''' Provides functionality for receiving message through peer connection
+        '''
     print("Starting receving thread....")
 
     global isSendThreadWorking
@@ -79,12 +87,16 @@ def startConnectionThreads(peerConn):
 
 
 def acceptPeerConn(sock):
+    ''' Accepts a connection request and starts a separate receiving thread for
+        each connection
+        '''
 
     global peerList
     peerList = []
 
     global isSendThreadWorking
 
+    #accepts connection until send thread does not end the connection
     while isSendThreadWorking:
 
         print("Waiting for peer connection")
@@ -98,7 +110,10 @@ def acceptPeerConn(sock):
 
 
 def validatIP():
+    ''' Validates IP address
+        '''
     global argHandle
+
     try:
         ipaddress.ip_address(argHandle.RemoteIPAndPort[0])
     except:
@@ -107,6 +122,8 @@ def validatIP():
     return True
 
 def handleArguments():
+    ''' Adds arguments and and validates them
+        '''
     parser = argparse.ArgumentParser()
     parser.add_argument("localPort", help= "Local port number to bind with",
             type = int)
@@ -126,16 +143,20 @@ def handleArguments():
     return True
 
 def main( arg = sys.argv ):
+
     handleArguments()
     global argHandle
 
+    #Creating socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     localAddr = socket.gethostname()
     port = int(argHandle.localPort)
 
+    #Binding address with socket
     sock.bind( (localAddr, port) )
     sock.listen(2)
 
+    #Creating threads
     sendingThread = threading.Thread(target = sendThread, args = (sock,
     "Server"))
     acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
@@ -143,6 +164,7 @@ def main( arg = sys.argv ):
     acceptPeerConnThread.setDaemon(True)
 
     global isSendThreadWorking
+
     sendingThread.start()
     isSendThreadWorking = True
     acceptPeerConnThread.start()
