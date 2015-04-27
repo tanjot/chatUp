@@ -71,21 +71,6 @@ def recvThread(conn, username):
     print("Exit receiving thread....")
 
 
-def startConnectionThreads(peerConn):
-    global argHandle
-    global peerList
-
-    if argHandle.localUsername:
-        username = argHandle.localUsername
-    else:
-        username = "NOname"
-
-    receivingThread = threading.Thread(target = recvThread, args = (peerConn,
-        username))
-    receivingThread.start()
-    receivingThread.join()
-
-
 def acceptPeerConn(sock):
     ''' Accepts a connection request and starts a separate receiving thread for
         each connection
@@ -95,6 +80,12 @@ def acceptPeerConn(sock):
     peerList = []
 
     global isSendThreadWorking
+    global argHandle
+
+    if argHandle.localUsername:
+        username = argHandle.localUsername
+    else:
+        username = "Server"
 
     #accepts connection until send thread does not end the connection
     while isSendThreadWorking:
@@ -103,10 +94,10 @@ def acceptPeerConn(sock):
         peerConn, peerAddr = sock.accept()
 
         peerList.append(peerConn)
-        acceptPeerConnThread = threading.Thread(target = startConnectionThreads, args =
-                (peerConn,) )
-        acceptPeerConnThread.start()
 
+        receivingThread = threading.Thread(target = recvThread, args = (peerConn,
+            username))
+        receivingThread.start()
 
 
 def validatIP():
@@ -156,9 +147,14 @@ def main( arg = sys.argv ):
     sock.bind( (localAddr, port) )
     sock.listen(2)
 
+    if argHandle.localUsername:
+        username = argHandle.localUsername
+    else:
+        username = "Server"
+
     #Creating threads
     sendingThread = threading.Thread(target = sendThread, args = (sock,
-    "Server"))
+    username))
     acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
             (sock,) )
     acceptPeerConnThread.setDaemon(True)

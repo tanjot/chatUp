@@ -29,7 +29,6 @@ def recvThread(conn, username):
     ''' Provides functionality for receiving message through peer connection
         '''
 
-
     print("Start receving thread....")
 
     global areSendReceiveWorking
