@@ -5,7 +5,7 @@ import threading
 import argparse
 import ipaddress
 
-def sendThread(conn, username):
+def sendThread(sock, username):
     print("Sending thread started....")
 
     global peerList
@@ -98,11 +98,6 @@ def acceptPeerConn(sock):
 
     global isSendThreadWorking
 
-    sendingThread = threading.Thread(target = sendThread, args = (sock,
-    "Server"))
-    sendingThread.start()
-    isSendThreadWorking = True
-
     while isSendThreadWorking:
         print("in while loop")
         peerConn, peerAddr = sock.accept()
@@ -121,7 +116,7 @@ def acceptPeerConn(sock):
        #     username))
        # receivingThread.start()
     print("Out of Loop")
-    sock.close()
+    #sock.close()
 
 
 def validatIP():
@@ -164,12 +159,19 @@ def main( arg = sys.argv ):
     sock.bind( (localAddr, port) )
     sock.listen(2)
 
-    #TODO: close socket appropriately
-
+    sendingThread = threading.Thread(target = sendThread, args = (sock,
+    "Server"))
     acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
             (sock,) )
+    acceptPeerConnThread.setDaemon(True)
+
+    global isSendThreadWorking
+    sendingThread.start()
+    isSendThreadWorking = True
     acceptPeerConnThread.start()
-    acceptPeerConnThread.join()
+    sendingThread.join()
+    #sock.close()
+    #acceptPeerConnThread.join()
 
     if handleArguments():
         #create connection to that remote
