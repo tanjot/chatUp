@@ -7,7 +7,7 @@ import argparse
 import ipaddress
 
 def sendThread(conn, username):
-    print("Sending thread started....")
+    print("Start sending thread....")
     inputStr = input()
 
     global areSendReceiveWorking
@@ -19,11 +19,11 @@ def sendThread(conn, username):
     msg = username + ": " + inputStr + "\n"
     conn.send( msg.encode() )
 
-    print("Sending thread end....")
+    print("Exit sending thread....")
     areSendReceiveWorking = False
 
 def recvThread(conn, username):
-    print("Receving thread started....")
+    print("Start receving thread....")
 
     global areSendReceiveWorking
     buffSize = 10
@@ -43,17 +43,14 @@ def recvThread(conn, username):
             else:
                 storedData = storedData + ch
 
-    print("Receving thread ended....")
+    print("Exit receving thread....")
     areSendReceiveWorking = False
 
 def connectToPeer():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     addr = socket.gethostname()
-    if sock:
-        print("hello")
 
-    #sock.bind( (addr, localPort) )
     global argHandle
     if argHandle.localUsername:
         username = argHandle.localUsername

@@ -6,7 +6,7 @@ import argparse
 import ipaddress
 
 def sendThread(sock, username):
-    print("Sending thread started....")
+    print("Start sending thread....")
 
     global peerList
     global isSendThreadWorking
@@ -23,7 +23,7 @@ def sendThread(sock, username):
     for conn in peerList:
         conn.send( msg.encode() )
 
-    print("Sending thread ended....")
+    print("Exit sending thread....")
     isSendThreadWorking = False
 
 def removeConnFromList(conn = None):
@@ -37,7 +37,7 @@ def removeConnFromList(conn = None):
         conn.close()
 
 def recvThread(conn, username):
-    print("Receving thread started....")
+    print("Starting receving thread....")
 
     global isSendThreadWorking
 
@@ -60,7 +60,7 @@ def recvThread(conn, username):
         removeConnFromList(conn)
     else:
         removeConnFromList()
-    print("Receving thread ended....")
+    print("Exit receiving thread....")
 
 
 def startConnectionThreads(peerConn):
@@ -79,7 +79,6 @@ def startConnectionThreads(peerConn):
 
 
 def acceptPeerConn(sock):
-    print('In acceptPeerConnections')
 
     global peerList
     peerList = []
@@ -87,7 +86,8 @@ def acceptPeerConn(sock):
     global isSendThreadWorking
 
     while isSendThreadWorking:
-        print("in while loop")
+
+        print("Waiting for peer connection")
         peerConn, peerAddr = sock.accept()
 
         peerList.append(peerConn)
@@ -95,7 +95,6 @@ def acceptPeerConn(sock):
                 (peerConn,) )
         acceptPeerConnThread.start()
 
-    print("Out of Loop")
 
 
 def validatIP():
@@ -131,7 +130,6 @@ def main( arg = sys.argv ):
     global argHandle
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print('In setUpLocalConnection port: '+str(argHandle.localPort))
     localAddr = socket.gethostname()
     port = int(argHandle.localPort)
 
@@ -151,9 +149,9 @@ def main( arg = sys.argv ):
     sendingThread.join()
     sock.close()
 
-    if handleArguments():
-        #create connection to that remote
-        print("No functionality for connecting to Peer")
+   # if handleArguments():
+   #     #create connection to that remote
+   #     print("No functionality for connecting to Peer")
     print("End of main...")
 
 
