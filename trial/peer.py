@@ -15,10 +15,10 @@ def sendThread(conn, username):
         msg = username + ": " + inputStr + "\n"
         conn.send( msg.encode() )
         inputStr = input()
-    
+
     msg = username + ": " + inputStr + "\n"
     conn.send( msg.encode() )
-                                            
+
     print("Sending thread end....")
     areSendReceiveWorking = False
 
@@ -44,7 +44,7 @@ def recvThread(conn, username):
                 storedData = storedData + ch
 
     print("Receving thread ended....")
-    areSendReceiveWorking = False 
+    areSendReceiveWorking = False
 
 def connectToPeer():
 
@@ -63,8 +63,8 @@ def connectToPeer():
     sock.connect((argHandle.RemoteIPAndPort[0],int(argHandle.RemoteIPAndPort[1])) )
 
     global areSendReceiveWorking
-    areSendReceiveWorking = True 
-    
+    areSendReceiveWorking = True
+
     receivingThread = threading.Thread(target = recvThread, args = (sock,
         username))
     sendingThread = threading.Thread(target = sendThread, args = (sock,
@@ -112,7 +112,6 @@ def main( arg = sys.argv ):
         global argHandle
         if argHandle:
             connectToPeer()
-#TODO: Close socket properly
 
 if __name__ == '__main__':
     main()

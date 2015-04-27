@@ -75,19 +75,7 @@ def startConnectionThreads(peerConn):
     receivingThread = threading.Thread(target = recvThread, args = (peerConn,
         username))
     receivingThread.start()
-   # if len(peerList) == 0:
-   #     sendingThread = threading.Thread(target = sendThread, args = (peerConn,
-   #     username))
-   #     sendingThread.start()
-   #     receivingThread.start()
-   #     sendingThread.join()
-   #     receivingThread.join()
-   # else:
-   #     receivingThread.start()
-   #     receivingThread.join()
     receivingThread.join()
-    #peerList.remove(peerConn)
-    #peerConn.close()
 
 
 def acceptPeerConn(sock):
@@ -107,16 +95,7 @@ def acceptPeerConn(sock):
                 (peerConn,) )
         acceptPeerConnThread.start()
 
-       # if argHandle.localUsername:
-       #     username = argHandle.localUsername
-       # else:
-       #     username = "NOname"
-
-       # receivingThread = threading.Thread(target = recvThread, args = (peerConn,
-       #     username))
-       # receivingThread.start()
     print("Out of Loop")
-    #sock.close()
 
 
 def validatIP():
