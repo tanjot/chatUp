@@ -30,8 +30,11 @@ def sendThread(sock, username):
     inputStr = input()
     while inputStr.lower() != "bye":
         msg = username + ": " + inputStr + "\n"
-        for conn in peerList:
-            conn.send( msg.encode()  )
+        if len(peerList) == 0:
+            print("No peer connected")
+        else:
+            for conn in peerList:
+                conn.send( msg.encode()  )
 
         inputStr = input()
 
