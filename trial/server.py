@@ -7,14 +7,21 @@ import ipaddress
 
 def sendThread(conn, username):
     print("Sending thread started....")
-    inputStr = input()
 
+    global peerList
+
+    inputStr = input()
     while inputStr.lower() != "bye":
         msg = username + ": " + inputStr + "\n"
-        conn.send( msg.encode()  )
+        for conn in peerList:
+            conn.send( msg.encode()  )
+
         inputStr = input()
+
     msg = username + ": " + inputStr + "\n"
-    conn.send( msg.encode() )
+    for conn in peerList:
+        conn.send( msg.encode() )
+
     print("Sending thread ended....")
 
 def recvThread(conn, username):
@@ -40,6 +47,8 @@ def recvThread(conn, username):
 
 def startConnectionThreads(peerConn):
     global argHandle
+    global peerList
+
     if argHandle.localUsername:
         username = argHandle.localUsername
     else:
@@ -47,24 +56,50 @@ def startConnectionThreads(peerConn):
 
     receivingThread = threading.Thread(target = recvThread, args = (peerConn,
         username))
-    sendingThread = threading.Thread(target = sendThread, args = (peerConn,
-        username))
-    sendingThread.start()
     receivingThread.start()
+   # if len(peerList) == 0:
+   #     sendingThread = threading.Thread(target = sendThread, args = (peerConn,
+   #     username))
+   #     sendingThread.start()
+   #     receivingThread.start()
+   #     sendingThread.join()
+   #     receivingThread.join()
+   # else:
+   #     receivingThread.start()
+   #     receivingThread.join()
     receivingThread.join()
-    sendingThread.join()
+    peerList.remove(peerConn)
     peerConn.close()
 
 
 def acceptPeerConn(sock):
     print('In acceptPeerConnections')
 
+    global peerList
+    peerList = []
+
+    sendingThread = threading.Thread(target = sendThread, args = (sock,
+    "Server"))
+    sendingThread.start()
+
     while True:
         print("in while loop")
         peerConn, peerAddr = sock.accept()
+
+        peerList.append(peerConn)
         acceptPeerConnThread = threading.Thread(target = startConnectionThreads, args =
                 (peerConn,) )
         acceptPeerConnThread.start()
+
+       # if argHandle.localUsername:
+       #     username = argHandle.localUsername
+       # else:
+       #     username = "NOname"
+
+       # receivingThread = threading.Thread(target = recvThread, args = (peerConn,
+       #     username))
+       # receivingThread.start()
+
 
 def validatIP():
     global argHandle

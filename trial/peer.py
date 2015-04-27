@@ -17,7 +17,7 @@ def sendThread(conn, username):
     msg = username + ": " + inputStr + "\n"
     conn.send( msg.encode() )
 
-    print("Sending thread started....")
+    print("Sending thread end....")
     #conn.close()
 
 def recvThread(conn, username):
@@ -63,6 +63,7 @@ def connectToPeer():
     sendingThread.start()
     receivingThread.join()
     sendingThread.join()
+    #if one of the threads dies close the other thread and then the connection
     sock.close()
 
 
