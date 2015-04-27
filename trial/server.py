@@ -170,8 +170,7 @@ def main( arg = sys.argv ):
     isSendThreadWorking = True
     acceptPeerConnThread.start()
     sendingThread.join()
-    #sock.close()
-    #acceptPeerConnThread.join()
+    sock.close()
 
     if handleArguments():
         #create connection to that remote
