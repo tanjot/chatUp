@@ -9,6 +9,7 @@ def sendThread(conn, username):
     print("Sending thread started....")
 
     global peerList
+    global isSendThreadWorking
 
     inputStr = input()
     while inputStr.lower() != "bye":
@@ -23,14 +24,27 @@ def sendThread(conn, username):
         conn.send( msg.encode() )
 
     print("Sending thread ended....")
+    isSendThreadWorking = False
+
+def removeConnFromList(conn = None):
+    global peerList
+    if conn is None:
+        for it in peerList:
+            peerList.remove(it)
+            it.close()
+    else:
+        peerList.remove(conn)
+        conn.close()
 
 def recvThread(conn, username):
     print("Receving thread started....")
 
+    global isSendThreadWorking
+
     buffSize = 10
     checkOnString = ""
     storedData = ""
-    while checkOnString != "bye":
+    while checkOnString != "bye" and isSendThreadWorking:
         data_recv = str(conn.recv(buffSize).decode())
 
         for ch in data_recv:
@@ -42,6 +56,10 @@ def recvThread(conn, username):
                 storedData = ""
             else:
                 storedData = storedData + ch
+    if isSendThreadWorking:
+        removeConnFromList(conn)
+    else:
+        removeConnFromList()
     print("Receving thread ended....")
 
 
@@ -68,8 +86,8 @@ def startConnectionThreads(peerConn):
    #     receivingThread.start()
    #     receivingThread.join()
     receivingThread.join()
-    peerList.remove(peerConn)
-    peerConn.close()
+    #peerList.remove(peerConn)
+    #peerConn.close()
 
 
 def acceptPeerConn(sock):
@@ -78,11 +96,14 @@ def acceptPeerConn(sock):
     global peerList
     peerList = []
 
+    global isSendThreadWorking
+
     sendingThread = threading.Thread(target = sendThread, args = (sock,
     "Server"))
     sendingThread.start()
+    isSendThreadWorking = True
 
-    while True:
+    while isSendThreadWorking:
         print("in while loop")
         peerConn, peerAddr = sock.accept()
 
@@ -99,6 +120,8 @@ def acceptPeerConn(sock):
        # receivingThread = threading.Thread(target = recvThread, args = (peerConn,
        #     username))
        # receivingThread.start()
+    print("Out of Loop")
+    sock.close()
 
 
 def validatIP():
