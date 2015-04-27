@@ -10,23 +10,27 @@ def sendThread(conn, username):
     print("Sending thread started....")
     inputStr = input()
 
-    while inputStr.lower() != "bye":
+    global areSendReceiveWorking
+    while inputStr.lower() != "bye" and areSendReceiveWorking:
         msg = username + ": " + inputStr + "\n"
-        conn.send( msg.encode()  )
+        conn.send( msg.encode() )
         inputStr = input()
+    
     msg = username + ": " + inputStr + "\n"
     conn.send( msg.encode() )
-
+                                            
     print("Sending thread end....")
-    #conn.close()
+    areSendReceiveWorking = False
 
 def recvThread(conn, username):
     print("Receving thread started....")
 
+    global areSendReceiveWorking
     buffSize = 10
     checkOnString = ""
     storedData = ""
-    while  checkOnString != "bye":
+
+    while  checkOnString != "bye" and areSendReceiveWorking:
         data_recv = str(conn.recv(buffSize).decode())
 
         for ch in data_recv:
@@ -40,11 +44,14 @@ def recvThread(conn, username):
                 storedData = storedData + ch
 
     print("Receving thread ended....")
+    areSendReceiveWorking = False 
 
 def connectToPeer():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     addr = socket.gethostname()
+    if sock:
+        print("hello")
 
     #sock.bind( (addr, localPort) )
     global argHandle
@@ -54,6 +61,10 @@ def connectToPeer():
         username = "NOname"
 
     sock.connect((argHandle.RemoteIPAndPort[0],int(argHandle.RemoteIPAndPort[1])) )
+
+    global areSendReceiveWorking
+    areSendReceiveWorking = True 
+    
     receivingThread = threading.Thread(target = recvThread, args = (sock,
         username))
     sendingThread = threading.Thread(target = sendThread, args = (sock,
