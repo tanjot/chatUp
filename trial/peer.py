@@ -37,17 +37,22 @@ def recvThread(conn, username):
     storedData = ""
 
     while  checkOnString != "bye" and areSendReceiveWorking:
-        data_recv = str(conn.recv(buffSize).decode())
-
-        for ch in data_recv:
-            if ch == '\n':
-                lastPrinted = storedData
-                print( lastPrinted )
-                index = lastPrinted.find(':')
-                checkOnString = lastPrinted[(index+1):].strip()
-                storedData = ""
-            else:
-                storedData = storedData + ch
+        try:
+            data_recv = str(conn.recv(buffSize).decode())
+        #TODO: Find exception name
+        except:
+            print("Problem in receiving from " + username)
+            checkOnString = "bye"
+        else:
+            for ch in data_recv:
+                if ch == '\n':
+                    lastPrinted = storedData
+                    print( lastPrinted )
+                    index = lastPrinted.find(':')
+                    checkOnString = lastPrinted[(index+1):].strip()
+                    storedData = ""
+                else:
+                    storedData = storedData + ch
 
     print("Exit receving thread....")
     areSendReceiveWorking = False
@@ -64,20 +69,26 @@ def connectToPeer():
     else:
         username = "NOname"
 
-    sock.connect((argHandle.RemoteIPAndPort[0],int(argHandle.RemoteIPAndPort[1])) )
+    try:
+        sock.connect((argHandle.RemoteIPAndPort[0],int(argHandle.RemoteIPAndPort[1])) )
+    except ConnectionRefusedError:
+        print("Problem in establishing connection using ip : " +
+                argHandle.RemoteIPAndPort[0] + " and port: " +
+                argHandle.RemoteIPAndPort[1])
 
-    global areSendReceiveWorking
-    areSendReceiveWorking = True
+    else:
+        global areSendReceiveWorking
+        areSendReceiveWorking = True
 
-    receivingThread = threading.Thread(target = recvThread, args = (sock,
-        username))
-    sendingThread = threading.Thread(target = sendThread, args = (sock,
-        username ))
+        receivingThread = threading.Thread(target = recvThread, args = (sock,
+            username))
+        sendingThread = threading.Thread(target = sendThread, args = (sock,
+            username ))
 
-    receivingThread.start()
-    sendingThread.start()
-    receivingThread.join()
-    sendingThread.join()
+        receivingThread.start()
+        sendingThread.start()
+        receivingThread.join()
+        sendingThread.join()
     #if one of the threads dies close the other thread and then the connection
     sock.close()
 
@@ -90,7 +101,7 @@ def validatIP():
     global argHandle
     try:
         ipaddress.ip_address(argHandle.RemoteIPAndPort[0])
-    except:
+    except ValueError:
         print("Remote IP not valid")
         return False
     return True
@@ -111,9 +122,9 @@ def handleArguments():
     global argHandle
     argHandle = parser.parse_args()
     if argHandle.RemoteIPAndPort:
-        return validatIP()
         print("ip: "+argHandle.RemoteIPAndPort[0], "port: "+
                 argHandle.RemoteIPAndPort[1])
+        return validatIP()
     return False
 
 

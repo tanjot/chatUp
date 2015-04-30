@@ -56,17 +56,23 @@ def recvThread(conn, username):
     checkOnString = ""
     storedData = ""
     while checkOnString != "bye" and isSendThreadWorking:
-        data_recv = str(conn.recv(buffSize).decode())
-
-        for ch in data_recv:
-            if ch == '\n':
-                lastPrinted = storedData
-                print( lastPrinted )
-                index = lastPrinted.find(':')
-                checkOnString = lastPrinted[(index+1):].strip()
-                storedData = ""
-            else:
-                storedData = storedData + ch
+        try:
+            data_recv = str(conn.recv(buffSize).decode())
+        #TODO: Find exception name
+        except:
+            print("Problem in receiving from " + username)
+            checkOnString = "bye"
+        else:
+            for ch in data_recv:
+                if ch == '\n':
+                    lastPrinted = storedData
+                    print( lastPrinted )
+                    index = lastPrinted.find(':')
+                    checkOnString = lastPrinted[(index+1):].strip()
+                    storedData = ""
+                else:
+                    storedData = storedData + ch
+    #Removes from peerList even if there is problem in receving messages
     if isSendThreadWorking:
         removeConnFromList(conn)
     else:
@@ -94,13 +100,18 @@ def acceptPeerConn(sock):
     while isSendThreadWorking:
 
         print("Waiting for peer connection")
-        peerConn, peerAddr = sock.accept()
+        try:
+            peerConn, peerAddr = sock.accept()
+        #TODO: Find exception name
+        except:
+            print("Problem  with socket while accepting request " )
+        else:
 
-        peerList.append(peerConn)
+            peerList.append(peerConn)
 
-        receivingThread = threading.Thread(target = recvThread, args = (peerConn,
-            username))
-        receivingThread.start()
+            receivingThread = threading.Thread(target = recvThread, args = (peerConn,
+                username))
+            receivingThread.start()
 
 
 def validatIP():
@@ -110,7 +121,7 @@ def validatIP():
 
     try:
         ipaddress.ip_address(argHandle.RemoteIPAndPort[0])
-    except:
+    except ValueError:
         print("Remote IP not valid")
         return False
     return True
@@ -130,10 +141,11 @@ def handleArguments():
     global argHandle
     argHandle = parser.parse_args()
     if argHandle.RemoteIPAndPort:
-        return validatIP()
         print("ip: "+argHandle.RemoteIPAndPort[0], "port: "+
                 argHandle.RemoteIPAndPort[1])
-    #Bcoz Remoteipandport is optional
+        return validatIP()
+
+    #Bcoz Remoteipandport is optional, if not present then return True
     return True
 
 def main( arg = sys.argv ):
@@ -146,29 +158,33 @@ def main( arg = sys.argv ):
     localAddr = socket.gethostname()
     port = int(argHandle.localPort)
 
-    #Binding address with socket
-    sock.bind( (localAddr, port) )
-    sock.listen(2)
-
-    if argHandle.localUsername:
-        username = argHandle.localUsername
+    try:
+        #Binding address with socket
+        sock.bind( (localAddr, port) )
+        sock.listen(2)
+    except OSError:
+        print("Socket not able to bind")
     else:
-        username = "Server"
 
-    #Creating threads
-    sendingThread = threading.Thread(target = sendThread, args = (sock,
-    username))
-    acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
-            (sock,) )
-    acceptPeerConnThread.setDaemon(True)
+        if argHandle.localUsername:
+            username = argHandle.localUsername
+        else:
+            username = "Server"
 
-    global isSendThreadWorking
+        #Creating threads
+        sendingThread = threading.Thread(target = sendThread, args = (sock,
+        username))
+        acceptPeerConnThread = threading.Thread(target = acceptPeerConn, args =
+                (sock,) )
+        acceptPeerConnThread.setDaemon(True)
 
-    sendingThread.start()
-    isSendThreadWorking = True
-    acceptPeerConnThread.start()
-    sendingThread.join()
-    sock.close()
+        global isSendThreadWorking
+
+        sendingThread.start()
+        isSendThreadWorking = True
+        acceptPeerConnThread.start()
+        sendingThread.join()
+        sock.close()
 
    # if handleArguments():
    #     #create connection to that remote
